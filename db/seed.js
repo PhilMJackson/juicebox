@@ -3,6 +3,8 @@ const { client, getAllUsers, createUser } = require("./index");
 // this function should call a query which drops all tables from our database
 async function dropTables() {
   try {
+    console.log("Starting to drop tables...");
+
     await client.query(`
     DROP TABLE IF EXISTS users;
       `);
@@ -42,23 +44,17 @@ async function createInitialUsers() {
       password: "bertie99",
     });
 
-    console.log(albert);
-
     const sandra = await createUser({
       username: "sandra",
       password: "2sandy4me",
     });
-
-    console.log(sandra);
 
     const glamgal = await createUser({
       username: "glamgal",
       password: "soglam",
     });
 
-    console.log(glamgal);
-
-    console.log("Finished creating users!");
+       console.log("Finished creating users!");
   } catch (error) {
     console.error("Error creating users!");
     throw error;

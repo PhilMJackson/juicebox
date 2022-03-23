@@ -1,5 +1,4 @@
 const { Client } = require("pg");
-const { rows } = require("pg/lib/defaults");
 
 const client = new Client("postgres://localhost:5432/juicebox-dev");
 
