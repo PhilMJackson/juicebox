@@ -6,6 +6,7 @@ async function dropTables() {
     console.log("Starting to drop tables...");
 
     await client.query(`
+    DROP TABLE IF EXISTS posts;
     DROP TABLE IF EXISTS users;
       `);
     console.log("Finished dropping tables!");
@@ -29,6 +30,13 @@ async function createTables() {
         location VARCHAR(255) NOT NULL,
         active BOOLEAN DEFAULT true
       );
+      CREATE TABLE posts(
+        id SERIAL PRIMARY KEY,
+        "authorId" INTEGER REFERENCES users(id) NOT NULL,
+        title VARCHAR(255) NOT NULL,
+        content TEXT NOT NULL,
+        active BOOLEAN DEFAULT true
+        );
       `);
 
     console.log("Finished building tables!");
@@ -46,8 +54,8 @@ async function createInitialUsers() {
       username: "albert",
       password: "bertie99",
       name: "albert",
-      location: 'Sidney, Australia',
-      active: true
+      location: "Sidney, Australia",
+      active: true,
     });
 
     const sandra = await createUser({
@@ -55,7 +63,7 @@ async function createInitialUsers() {
       password: "2sandy4me",
       name: "Just Sandra",
       location: "Ain't tellin",
-      active: true
+      active: true,
     });
 
     const glamgal = await createUser({
@@ -63,10 +71,10 @@ async function createInitialUsers() {
       password: "soglam",
       name: "Joshua",
       location: "Upper East Side",
-      active: true
+      active: true,
     });
 
-       console.log("Finished creating users!");
+    console.log("Finished creating users!");
   } catch (error) {
     console.error("Error creating users!");
     throw error;
@@ -89,14 +97,14 @@ async function testDB() {
   try {
     console.log("Starting to test database...");
 
-    console.log("Calling getAllUsers")
+    console.log("Calling getAllUsers");
     const users = await getAllUsers();
     console.log("Result:", users);
 
-    console.log("Calling updateUser on users[0]")
+    console.log("Calling updateUser on users[0]");
     const updateUserResult = await updateUser(users[0].id, {
       name: "Newname Sogood",
-      location: "Lesterville, KY"
+      location: "Lesterville, KY",
     });
     console.log("Result:", updateUserResult);
 
