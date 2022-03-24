@@ -1,4 +1,5 @@
 const { Client } = require("pg");
+const { user } = require("pg/lib/defaults");
 
 const client = new Client("postgres://localhost:5432/juicebox-dev");
 
@@ -17,26 +18,22 @@ async function getAllUsers() {
 
 async function getUserById(userId) {
   try {
-    const { rows } = await client.query(
+    const { rows: [ user ] } = await client.query(
       `SELECT id, username, name, location, active 
         FROM users WHERE id=${userId};
       `
     );
 
-    return rows;
+    if (!user) {
+      return null
+    }
+
+    user.posts = await getPostsByUser(userId);
+
+    return user;
   } catch (error) {
     throw error;
   }
-  // first get the user (NOTE: Remember the query returns
-  // (1) an object that contains
-  // (2) a `rows` array that (in this case) will contain
-  // (3) one object, which is our user.
-  // if it doesn't exist (if there are no `rows` or `rows.length`), return null
-  // if it does:
-  // delete the 'password' key from the returned object
-  // get their posts (use getPostsByUser)
-  // then add the posts to the user object with key 'posts'
-  // return the user object
 }
 
 async function createUser({ username, password, name, location }) {
@@ -136,12 +133,7 @@ async function createPost({ authorId, title, content }) {
 
 async function updatePost(
   id,
-  fields = {
-    title,
-    content,
-    active,
-  }
-) {
+  fields = {}) {
   const setString = Object.keys(fields)
     .map((key, index) => `"${key}"=$${index + 1}`)
     .join(", ");
