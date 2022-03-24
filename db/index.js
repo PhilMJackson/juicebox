@@ -90,12 +90,17 @@ async function updateUser(id, fields = {}) {
 
 async function getAllPosts() {
   try {
-    const { rows } = await client.query(
-      `SELECT id, "authorId", title, content, active 
+    const { rows: postIds } = await client.query(
+      `SELECT id 
         FROM posts;
       `
     );
-    return rows;
+
+    const posts = await Promise.all(
+      postIds.map((post) => getPostById(post.id))
+    );
+
+    return posts;
   } catch (error) {
     throw error;
   }
@@ -103,18 +108,23 @@ async function getAllPosts() {
 
 async function getPostsByUser(userId) {
   try {
-    const { rows } = await client.query(`
-      SELECT * FROM posts
+    const { rows: postIds } = await client.query(`
+      SELECT id
+      FROM posts
       WHERE "authorId"=${userId};
     `);
 
-    return rows;
+    const posts = await Promise.all(
+      postIds.map((post) => getPostById(post.id))
+    );
+
+    return posts;
   } catch (error) {
     throw error;
   }
 }
 
-async function createPost({ authorId, title, content }) {
+async function createPost({ authorId, title, content, tags = [] }) {
   try {
     const {
       rows: [post],
@@ -127,7 +137,9 @@ async function createPost({ authorId, title, content }) {
       [authorId, title, content]
     );
 
-    return post;
+    const tagList = await createTags(tags);
+
+    return await addTagsToPost(post.id, tagList);
   } catch (error) {
     throw error;
   }
@@ -214,22 +226,27 @@ async function createTags(tagList) {
   const insertValues = tagList.map((_, index) => `$${index + 1}`).join("), (");
 
   const selectValues = tagList.map((_, index) => `$${index + 1}`).join(", ");
-  console.log(insertValues)
+  console.log(insertValues);
   try {
-    await client.query(`
+    await client.query(
+      `
       INSERT INTO tags(name)
       VALUES (${insertValues})
       ON CONFLICT (name) DO NOTHING;
-      `, tagList);
+      `,
+      tagList
+    );
 
-    const { rows } = await client.query(`
+    const { rows } = await client.query(
+      `
       SELECT * FROM tags
       WHERE name
       IN (${selectValues});
-      `, tagList);
-    
-   
-    return  rows;
+      `,
+      tagList
+    );
+
+    return rows;
   } catch (error) {
     throw error;
   }
