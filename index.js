@@ -10,9 +10,6 @@ server.use(morgan("dev"));
 
 server.use(express.json());
 
-const { client } = require("./db");
-client.connect();
-
 server.use((req, res, next) => {
   console.log("<____Body Logger START____>");
   console.log(req.body);
@@ -20,6 +17,10 @@ server.use((req, res, next) => {
 
   next();
 });
+
+const { client } = require("./db");
+client.connect();
+
 server.listen(PORT, () => {
   console.log("The server is up on port", PORT);
 });
