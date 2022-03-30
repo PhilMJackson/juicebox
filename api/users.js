@@ -1,8 +1,8 @@
 const express = require("express");
 const usersRouter = express.Router();
 const jwt = require("jsonwebtoken");
-const { requireUser } = require("../api")
-const { getAllUsers, getUserByUsername, createUser, getUserById } = require("../db");
+const { requireUser } = require("./utils")
+const { getAllUsers, getUserByUsername, createUser, getUserById, updateUser } = require("../db");
 
 usersRouter.use((req, res, next) => {
   console.log("A request is being made to /users");
@@ -95,8 +95,9 @@ usersRouter.post("/register", async (req, res, next) => {
 usersRouter.delete("/:userId", requireUser, async (req, res, next) => {
   try {
     const user = await getUserById(req.params.userId);
-
-    if (user === req.user.id) {
+      console.log(user, 'user')
+      console.log(req.user, 'req.user')
+    if (user && user.id === req.user.id) {
       const updatedUser = await updateUser(user.id, { active: false });
 
       res.send({ user: updatedUser });
