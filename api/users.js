@@ -1,17 +1,11 @@
 const express = require("express");
 const usersRouter = express.Router();
 const jwt = require("jsonwebtoken");
-const { requireUser } = require("./utils");
-const {
-  getAllUsers,
-  getUserByUsername,
-  createUser,
-  getUserById,
-  updateUser,
-} = require("../db");
+const { requireUser } = require("./utils")
+const { getAllUsers, getUserByUsername, createUser, getUserById, updateUser } = require("../db");
 
 usersRouter.use((req, res, next) => {
-  console.log("A request is being made to /users");
+  
   next();
 });
 
@@ -98,36 +92,11 @@ usersRouter.post("/register", async (req, res, next) => {
   }
 });
 
-usersRouter.patch("/:userId", requireUser, async (req, res, next) => {
-  try {
-    const user = await getUserById(req.params.userId);
-    if (user && user.id === req.user.id) {
-      const activateUser = await updateUser(user.id, { active: true });
-      const deactivateUser = await updateUser(user.id, { active: false });
-      user.active
-        ? res.send({ user: deactivateUser })
-        : res.send({ user: activateUser });
-    } else {
-      next(
-        user
-          ? {
-              name: "UnauthorizedUserError",
-              message: "You must login to toggle your user status",
-            }
-          : {
-              name: "UserNotFoundError",
-              message: "That user ID does not exist",
-            }
-      );
-    }
-  } catch ({ name, message }) {
-    next({ name, message });
-  }
-});
-
 usersRouter.delete("/:userId", requireUser, async (req, res, next) => {
   try {
     const user = await getUserById(req.params.userId);
+      console.log(user, 'user')
+      console.log(req.user, 'req.user')
     if (user && user.id === req.user.id) {
       const updatedUser = await updateUser(user.id, { active: false });
 
@@ -140,7 +109,7 @@ usersRouter.delete("/:userId", requireUser, async (req, res, next) => {
               message: "You must login to delete your user ID",
             }
           : {
-              name: "UserNotFoundError",
+              name: "PostNotFoundError",
               message: "That user ID does not exist",
             }
       );
