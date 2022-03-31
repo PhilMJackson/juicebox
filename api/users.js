@@ -1,8 +1,11 @@
+const cors = require("cors");
 const express = require("express");
 const usersRouter = express.Router();
 const jwt = require("jsonwebtoken");
 const { requireUser } = require("./utils")
 const { getAllUsers, getUserByUsername, createUser, getUserById, updateUser } = require("../db");
+const { append } = require("express/lib/response");
+usersRouter.use(cors)();
 
 usersRouter.use((req, res, next) => {
   
