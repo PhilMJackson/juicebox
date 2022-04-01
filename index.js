@@ -1,9 +1,12 @@
+const cors = require("cors");
 require("dotenv").config();
 const { PORT = 3000 } = process.env;
 const express = require("express");
 const server = express();
-
 const morgan = require("morgan");
+
+server.use(cors());
+
 server.use(morgan("dev"));
 
 server.use(express.json());
