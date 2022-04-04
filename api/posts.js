@@ -38,11 +38,11 @@ postsRouter.get("/", async (req, res, next) => {
   try {
     const allPosts = await getAllPosts();
     // keep a post if it is either active, or if it belongs to the current user
-    console.log("All Posts:", allPosts);
     const posts = allPosts.filter((post) => {
       return (
-        (post.active && post.author.active) ||
-        (req.user && post.author.id === req.user.id)
+        post.active && post.author.active
+        // ||
+        // (req.user && post.author.id === req.user.id)
       );
     });
     res.send({
