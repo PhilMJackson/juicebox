@@ -59,7 +59,7 @@ postsRouter.get("/allposts", async (req, res, next) => {
       return post.active;
     });
     res.send({
-      posts: allPosts,
+      posts: posts,
     });
   } catch ({ name, message }) {
     next({ name, message });
